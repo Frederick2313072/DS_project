@@ -1,0 +1,43 @@
+# 因果语言建模实验配置
+# 每次运行可通过命令行覆盖任意参数
+
+# 通用超参
+seed: 42
+max_seq_len: 256
+num_train_epochs: 3
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 8
+gradient_accumulation_steps: 8
+learning_rate: 5.0e-5
+warmup_ratio: 0.05
+weight_decay: 0.01
+fp16: true
+
+# 数据集设置
+dataset: wikitext            # wikitext / openwebtext / both
+owt_subset_size: 50000       # openwebtext 子集大小（条数）
+max_train_samples: null      # null = 全部; 调试时可设 1000
+max_eval_samples: 5000
+
+# 输出路径
+output_dir: ./results
+results_csv: ./results/results_lm.csv
+
+# 运行顺序（批量实验用）
+experiments:
+  - model_name: opt-1.3b
+    dataset: wikitext
+  - model_name: opt-1.3b
+    dataset: openwebtext
+  - model_name: falcon-1b
+    dataset: wikitext
+  - model_name: falcon-1b
+    dataset: openwebtext
+  - model_name: mpt-1b
+    dataset: wikitext
+  - model_name: mpt-1b
+    dataset: openwebtext
+  - model_name: llama3-1b
+    dataset: wikitext
+  - model_name: llama3-1b
+    dataset: openwebtext

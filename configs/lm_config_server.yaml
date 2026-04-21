@@ -1,0 +1,41 @@
+# 服务器（GPU）实验配置
+# 使用方式：python src/run_all.py --config configs/lm_config_server.yaml
+# 或单个实验：python src/train_lm.py --model_name opt-1.3b --dataset wikitext
+
+seed: 42
+max_seq_len: 512           # GPU 显存充足，恢复 512
+num_train_epochs: 3
+per_device_train_batch_size: 8    # A100/V100 推荐 8-16，根据显存调整
+per_device_eval_batch_size: 16
+gradient_accumulation_steps: 4
+learning_rate: 5.0e-5
+warmup_ratio: 0.05
+weight_decay: 0.01
+fp16: true                 # GPU 开启 fp16
+
+# 全量数据（不限制样本数）
+dataset: wikitext
+owt_subset_size: 50000
+max_train_samples: null
+max_eval_samples: null
+
+output_dir: ./results
+results_csv: ./results/results_lm.csv
+
+experiments:
+  - model_name: opt-1.3b
+    dataset: wikitext
+  - model_name: opt-1.3b
+    dataset: openwebtext
+  - model_name: falcon-1b
+    dataset: wikitext
+  - model_name: falcon-1b
+    dataset: openwebtext
+  - model_name: mpt-1b
+    dataset: wikitext
+  - model_name: mpt-1b
+    dataset: openwebtext
+  - model_name: llama3-1b
+    dataset: wikitext
+  - model_name: llama3-1b
+    dataset: openwebtext

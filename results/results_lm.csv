@@ -1,0 +1,2 @@
+model,attn_type,dataset,epoch,eval_loss,perplexity,tokens_per_sec,gpu_mem_mb
+opt-1.3b,MHA,wikitext,1.0,2.5917,13.35,0.0,0.0

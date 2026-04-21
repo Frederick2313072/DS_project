@@ -1,0 +1,8 @@
+{
+  "model": "opt-1.3b",
+  "model_id": "facebook/opt-1.3b",
+  "attn_type": "MHA",
+  "params_M": 1315.8,
+  "num_attention_heads": 32,
+  "num_key_value_heads": null
+}
