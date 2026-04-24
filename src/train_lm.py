@@ -294,12 +294,15 @@ def run_experiment(args: LMExperimentArgs):
     # - MPS  : bfloat16（Apple Silicon 原生支持，比 fp32 快 2-4x，比 fp16 稳定）
     # - CPU  : fp32
     if torch.cuda.is_available():
-        load_dtype = torch.float16 if args.fp16 else torch.float32
+        # 混合精度训练(fp16=True)要求权重保持fp32，Trainer内部会自动cast到fp16做前向，
+        # 并用GradScaler在反向时unscale梯度。若此处把权重直接加载为fp16，
+        # 会触发"Attempting to unscale FP16 gradients"报错。
+        load_dtype = torch.float32
         device_map = "auto"
         use_fp16 = args.fp16
         use_bf16 = False
         target_device = "cuda"
-        logger.info("设备: CUDA")
+        logger.info("设备: CUDA (权重fp32 + 混合精度fp16)")
     elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         load_dtype = torch.bfloat16
         device_map = None
