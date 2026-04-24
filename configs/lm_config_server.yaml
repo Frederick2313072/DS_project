@@ -22,20 +22,11 @@ max_eval_samples: null
 output_dir: ./results
 results_csv: ./results/results_lm.csv
 
+# 三种注意力机制各一个代表模型，统一在 wikitext 上对比
 experiments:
-  - model_name: opt-1.3b
+  - model_name: opt-1.3b      # MHA
     dataset: wikitext
-  - model_name: opt-1.3b
-    dataset: openwebtext
-  - model_name: falcon-1b
+  - model_name: llama3-1b     # GQA
     dataset: wikitext
-  - model_name: falcon-1b
-    dataset: openwebtext
-  - model_name: mpt-1b
+  - model_name: falcon-1b     # MQA
     dataset: wikitext
-  - model_name: mpt-1b
-    dataset: openwebtext
-  - model_name: llama3-1b
-    dataset: wikitext
-  - model_name: llama3-1b
-    dataset: openwebtext

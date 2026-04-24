@@ -36,8 +36,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 模型配置：名称 → HuggingFace 模型 ID + 注意力类型标注
+# 模型配置：名称 → HuggingFace 模型 ID + 注意力类型
+# 三种注意力机制各取一个 1B 级代表模型
 MODEL_CONFIGS = {
+    "opt-1.3b": {
+        "model_id": "facebook/opt-1.3b",
+        "attn_type": "MHA",
+    },
     "llama3-1b": {
         "model_id": "meta-llama/Llama-3.2-1B",
         "attn_type": "GQA",
@@ -45,14 +50,6 @@ MODEL_CONFIGS = {
     "falcon-1b": {
         "model_id": "tiiuae/falcon-rw-1b",
         "attn_type": "MQA",
-    },
-    "mpt-1b": {
-        "model_id": "mosaicml/mpt-1b-redpajama-200b",
-        "attn_type": "MHA",
-    },
-    "opt-1.3b": {
-        "model_id": "facebook/opt-1.3b",
-        "attn_type": "MHA",
     },
 }
 
