@@ -105,6 +105,11 @@ class MetricsCallback(TrainerCallback):
         self.step_start_time: float = time.time()
         self.epoch_train_tokens: int = 0
         self.rows: list[dict] = []
+        # step-level loss 输出文件：results/step_loss_{model}_{dataset}.csv
+        safe_ds = dataset_name.replace("+", "_")
+        self.step_csv_path = os.path.join(
+            args.output_dir, f"step_loss_{model_name}_{safe_ds}.csv"
+        )
 
     def on_epoch_begin(self, args, state: TrainerState, control: TrainerControl, **kwargs):
         self.epoch_start_time = time.time()
@@ -114,7 +119,7 @@ class MetricsCallback(TrainerCallback):
         self.step_start_time = time.time()
 
     def on_log(self, args, state: TrainerState, control: TrainerControl, logs=None, **kwargs):
-        """打印每步训练日志，包含步耗时"""
+        """打印每步训练日志，包含步耗时；同时追加写 step-level loss CSV"""
         if logs is None:
             return
         if "loss" in logs:
@@ -133,6 +138,22 @@ class MetricsCallback(TrainerCallback):
                 f"  lr={logs.get('learning_rate', 0):.2e}"
                 f"  {step_sec:.1f}s/step  {tok_s:.0f} tok/s"
             )
+            # 追加写 step-level 训练 loss，用于收敛平滑度分析
+            step_row = {
+                "model": self.model_name,
+                "attn_type": self.attn_type,
+                "dataset": self.dataset_name,
+                "step": state.global_step,
+                "epoch": round(state.epoch or 0, 3),
+                "train_loss": round(logs["loss"], 4),
+            }
+            os.makedirs(os.path.dirname(self.step_csv_path), exist_ok=True)
+            write_header = not os.path.exists(self.step_csv_path)
+            with open(self.step_csv_path, "a", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=list(step_row.keys()))
+                if write_header:
+                    writer.writeheader()
+                writer.writerow(step_row)
 
     def on_evaluate(self, args, state: TrainerState, control: TrainerControl, metrics=None, **kwargs):
         if metrics is None:

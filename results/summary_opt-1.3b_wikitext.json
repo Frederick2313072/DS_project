@@ -2,18 +2,38 @@
   "model": "opt-1.3b",
   "attn_type": "MHA",
   "dataset": "wikitext",
-  "train_runtime_s": 502.8,
-  "train_samples_per_second": 0.2,
+  "train_runtime_s": 2206.6,
+  "train_samples_per_second": 6.4,
   "epoch_records": [
     {
       "model": "opt-1.3b",
       "attn_type": "MHA",
       "dataset": "wikitext",
       "epoch": 1.0,
-      "eval_loss": 2.5917,
-      "perplexity": 13.35,
-      "tokens_per_sec": 0.0,
-      "gpu_mem_mb": 0.0
+      "eval_loss": 2.5747,
+      "perplexity": 13.13,
+      "tokens_per_sec": 621.8,
+      "gpu_mem_mb": 32498.6
+    },
+    {
+      "model": "opt-1.3b",
+      "attn_type": "MHA",
+      "dataset": "wikitext",
+      "epoch": 2.0,
+      "eval_loss": 2.5881,
+      "perplexity": 13.3,
+      "tokens_per_sec": 629.6,
+      "gpu_mem_mb": 32498.6
+    },
+    {
+      "model": "opt-1.3b",
+      "attn_type": "MHA",
+      "dataset": "wikitext",
+      "epoch": 3.0,
+      "eval_loss": 2.6302,
+      "perplexity": 13.88,
+      "tokens_per_sec": 724.2,
+      "gpu_mem_mb": 32500.6
     }
   ]
 }

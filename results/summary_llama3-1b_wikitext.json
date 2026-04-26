@@ -1,0 +1,39 @@
+{
+  "model": "llama3-1b",
+  "attn_type": "GQA",
+  "dataset": "wikitext",
+  "train_runtime_s": 1167.0,
+  "train_samples_per_second": 12.32,
+  "epoch_records": [
+    {
+      "model": "llama3-1b",
+      "attn_type": "GQA",
+      "dataset": "wikitext",
+      "epoch": 1.0,
+      "eval_loss": 2.4893,
+      "perplexity": 12.05,
+      "tokens_per_sec": 587.6,
+      "gpu_mem_mb": 33550.6
+    },
+    {
+      "model": "llama3-1b",
+      "attn_type": "GQA",
+      "dataset": "wikitext",
+      "epoch": 2.0,
+      "eval_loss": 2.5744,
+      "perplexity": 13.12,
+      "tokens_per_sec": 667.6,
+      "gpu_mem_mb": 33550.6
+    },
+    {
+      "model": "llama3-1b",
+      "attn_type": "GQA",
+      "dataset": "wikitext",
+      "epoch": 3.0,
+      "eval_loss": 2.8758,
+      "perplexity": 17.74,
+      "tokens_per_sec": 586.4,
+      "gpu_mem_mb": 33550.6
+    }
+  ]
+}

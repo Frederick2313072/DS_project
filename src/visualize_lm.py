@@ -14,10 +14,8 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from mplfonts.bin.cli import init  # 中文字体初始化
 
-init()
-matplotlib.rcParams["font.family"] = "Source Han Sans CN"
+matplotlib.rcParams["font.family"] = "DejaVu Sans"
 matplotlib.rcParams["axes.unicode_minus"] = False
 
 # 注意力类型颜色映射
@@ -64,7 +62,7 @@ def plot_loss_curves(df: pd.DataFrame, save_dir: str):
                 linewidth=2,
                 markersize=6,
             )
-        ax.set_title(f"验证集 Loss — {ds}", fontsize=13)
+        ax.set_title(f"Validation Loss — {ds}", fontsize=13)
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Eval Loss")
         ax.legend(fontsize=9)
@@ -100,7 +98,7 @@ def plot_ppl_curves(df: pd.DataFrame, save_dir: str):
                 linewidth=2,
                 markersize=6,
             )
-        ax.set_title(f"困惑度 PPL — {ds}", fontsize=13)
+        ax.set_title(f"Perplexity — {ds}", fontsize=13)
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Perplexity")
         ax.legend(fontsize=9)
@@ -127,8 +125,8 @@ def plot_ppl_boxplot(df: pd.DataFrame, save_dir: str):
         patch.set_alpha(0.7)
 
     ax.set_xticklabels(labels, fontsize=11)
-    ax.set_title("不同注意力机制的 PPL 分布", fontsize=13)
-    ax.set_xlabel("注意力类型")
+    ax.set_title("PPL Distribution by Attention Type", fontsize=13)
+    ax.set_xlabel("Attention Type")
     ax.set_ylabel("Perplexity")
     ax.grid(True, axis="y", linestyle="--", alpha=0.5)
 
@@ -179,9 +177,9 @@ def plot_speed_scatter(df: pd.DataFrame, save_dir: str):
             fontsize=8,
         )
 
-    ax.set_title("速度 vs 困惑度（最终 Epoch，越左下越好）", fontsize=13)
-    ax.set_xlabel("Tokens / sec（训练吞吐）")
-    ax.set_ylabel("Perplexity（越低越好）")
+    ax.set_title("Speed vs Perplexity (Final Epoch, lower-left is better)", fontsize=13)
+    ax.set_xlabel("Tokens / sec (Training Throughput)")
+    ax.set_ylabel("Perplexity (lower is better)")
 
     # 去重图例
     handles, labels_ = ax.get_legend_handles_labels()
@@ -233,9 +231,9 @@ def plot_gpu_mem_scatter(df: pd.DataFrame, save_dir: str):
             fontsize=8,
         )
 
-    ax.set_title("GPU 显存 vs 困惑度（最终 Epoch）", fontsize=13)
-    ax.set_xlabel("GPU 显存占用（MB）")
-    ax.set_ylabel("Perplexity（越低越好）")
+    ax.set_title("GPU Memory vs Perplexity (Final Epoch)", fontsize=13)
+    ax.set_xlabel("GPU Memory (MB)")
+    ax.set_ylabel("Perplexity (lower is better)")
 
     handles, labels_ = ax.get_legend_handles_labels()
     seen = {}
@@ -250,6 +248,55 @@ def plot_gpu_mem_scatter(df: pd.DataFrame, save_dir: str):
 
     plt.tight_layout()
     path = os.path.join(save_dir, "gpu_mem_vs_ppl.png")
+    plt.savefig(path, dpi=150)
+    plt.close()
+    print(f"保存: {path}")
+
+
+def plot_step_loss_curves(results_dir: str, save_dir: str):
+    """折线图：step 级别训练 loss（原始 + 滑动平均），分析收敛平滑度"""
+    import glob
+    step_files = sorted(glob.glob(os.path.join(results_dir, "step_loss_*.csv")))
+    if not step_files:
+        print("未找到 step_loss_*.csv，跳过 step 级别分析")
+        return
+
+    df_step = pd.concat([pd.read_csv(f) for f in step_files], ignore_index=True)
+
+    fig, axes = plt.subplots(1, 2, figsize=(15, 5))
+
+    # 左：原始 step loss
+    ax = axes[0]
+    for (model, dataset), gdf in df_step.groupby(["model", "dataset"]):
+        gdf = gdf.sort_values("step")
+        attn = gdf["attn_type"].iloc[0]
+        color = ATTN_COLORS.get(attn, "#9E9E9E")
+        ax.plot(gdf["step"], gdf["train_loss"], color=color,
+                label=f"{model} ({attn})", linewidth=1.0, alpha=0.7)
+    ax.set_title("Training Loss vs Step (Raw)", fontsize=13)
+    ax.set_xlabel("Step")
+    ax.set_ylabel("Train Loss")
+    ax.legend(fontsize=9)
+    ax.grid(True, linestyle="--", alpha=0.4)
+
+    # 右：滑动平均平滑后的 loss（窗口 = 步数 / 20）
+    ax = axes[1]
+    for (model, dataset), gdf in df_step.groupby(["model", "dataset"]):
+        gdf = gdf.sort_values("step")
+        attn = gdf["attn_type"].iloc[0]
+        color = ATTN_COLORS.get(attn, "#9E9E9E")
+        window = max(5, len(gdf) // 20)
+        smoothed = gdf["train_loss"].rolling(window=window, min_periods=1).mean()
+        ax.plot(gdf["step"], smoothed, color=color,
+                label=f"{model} ({attn}, w={window})", linewidth=2.0)
+    ax.set_title("Training Loss vs Step (Smoothed)", fontsize=13)
+    ax.set_xlabel("Step")
+    ax.set_ylabel("Train Loss (smoothed)")
+    ax.legend(fontsize=9)
+    ax.grid(True, linestyle="--", alpha=0.4)
+
+    plt.tight_layout()
+    path = os.path.join(save_dir, "step_loss_curves.png")
     plt.savefig(path, dpi=150)
     plt.close()
     print(f"保存: {path}")
@@ -277,7 +324,7 @@ def plot_convergence_smoothness(df: pd.DataFrame, save_dir: str):
             markersize=5,
         )
 
-    ax.set_title("Loss 波动量（|ΔLoss| vs Epoch）", fontsize=13)
+    ax.set_title("|ΔLoss| vs Epoch (Convergence Smoothness)", fontsize=13)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("|ΔEval Loss|")
     ax.legend(fontsize=8)
@@ -321,6 +368,7 @@ def main():
     plot_speed_scatter(df, args.save_dir)
     plot_gpu_mem_scatter(df, args.save_dir)
     plot_convergence_smoothness(df, args.save_dir)
+    plot_step_loss_curves(os.path.dirname(args.csv), args.save_dir)
     generate_summary_table(df, args.save_dir)
 
     print("\n所有图表已保存至:", args.save_dir)

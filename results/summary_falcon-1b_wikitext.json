@@ -1,0 +1,39 @@
+{
+  "model": "falcon-1b",
+  "attn_type": "MQA",
+  "dataset": "wikitext",
+  "train_runtime_s": 2655.3,
+  "train_samples_per_second": 5.26,
+  "epoch_records": [
+    {
+      "model": "falcon-1b",
+      "attn_type": "MQA",
+      "dataset": "wikitext",
+      "epoch": 1.0,
+      "eval_loss": 2.58,
+      "perplexity": 13.2,
+      "tokens_per_sec": 503.3,
+      "gpu_mem_mb": 34350.6
+    },
+    {
+      "model": "falcon-1b",
+      "attn_type": "MQA",
+      "dataset": "wikitext",
+      "epoch": 2.0,
+      "eval_loss": 2.6641,
+      "perplexity": 14.35,
+      "tokens_per_sec": 502.4,
+      "gpu_mem_mb": 34350.6
+    },
+    {
+      "model": "falcon-1b",
+      "attn_type": "MQA",
+      "dataset": "wikitext",
+      "epoch": 3.0,
+      "eval_loss": 2.9159,
+      "perplexity": 18.47,
+      "tokens_per_sec": 502.6,
+      "gpu_mem_mb": 34350.6
+    }
+  ]
+}
